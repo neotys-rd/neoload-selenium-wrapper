@@ -22,7 +22,7 @@ namespace NeoLoadSelenium.tests.integration
             Environment.SetEnvironmentVariable("nl.data.exchange.url", "http://localhost:7400/DataExchange/v1/Service.svc/");
             Environment.SetEnvironmentVariable("nl.api.key", "key");
 
-            var webDriver = new FirefoxDriver(NLWebDriverFactory.AddProxyCapabilitiesIfNecessary(new DesiredCapabilities()));
+            var webDriver = new RemoteWebDriver(DesiredCapabilities.HtmlUnitWithJavaScript());
 
             string projectPath = "C:\\Users\\dregnier\\Documents\\NeoLoad Projects\\v5.3\\Sample_Project\\Sample_Project.nlp";
 

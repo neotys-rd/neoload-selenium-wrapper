@@ -39,7 +39,7 @@ namespace NeoLoadSelenium.tests.unit
         public void testCreatePathURLSplit()
         {
 
-            List<string> path = EUEEntryHandler.createPath("current/url", "pageTitle", ConfigurationHelper.newEUEConfiguration(""));
+            List<string> path = EUEEntryHandler.CreatePath("current/url", "pageTitle", ConfigurationHelper.newEUEConfiguration("", null));
 
             Assert.AreEqual(4, path.Count); // Fail if Path doesn't have enough parts.
             Assert.AreEqual("url", path[path.Count - 1]); // Fail if End of the path is wrong.
@@ -51,11 +51,11 @@ namespace NeoLoadSelenium.tests.unit
         [TestMethod]
         public void testCreatePathCustomNameSplit()
         {
-            var conf = ConfigurationHelper.newEUEConfiguration("");
+            var conf = ConfigurationHelper.newEUEConfiguration("", "");
             conf.CurrentCustomName = "bob/cobb/custom/name";
 
 
-            List<string> path = EUEEntryHandler.createPath("current/url", "pageTitle/something", conf);
+            List<string> path = EUEEntryHandler.CreatePath("current/url", "pageTitle/something", conf);
 
             Assert.AreEqual(6, path.Count); // Fail if Path doesn't have enough parts.
             Assert.AreEqual("name", path[path.Count - 1]); // Fail if End of the path is wrong.
@@ -71,7 +71,7 @@ namespace NeoLoadSelenium.tests.unit
             {
                 Environment.SetEnvironmentVariable("nl.path.naming.policy", "Title");
 
-                List<string> path = EUEEntryHandler.createPath("current/url", "bob/pageTitle/something", ConfigurationHelper.newEUEConfiguration(""));
+                List<string> path = EUEEntryHandler.CreatePath("current/url", "bob/pageTitle/something", ConfigurationHelper.newEUEConfiguration("", null));
 
                 Assert.AreEqual(5, path.Count); // Fail if Path doesn't have enough parts.
                 Assert.AreEqual("something", path[path.Count - 1]); // Fail if End of the path is wrong.

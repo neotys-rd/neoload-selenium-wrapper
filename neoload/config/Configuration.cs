@@ -1,17 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
+﻿
 namespace NeoLoadSelenium.neoload.config
 {
     public class CommonConfiguration
     {
         public string ApiKey { get; }
-        
-        public CommonConfiguration(string apiKey)
+
+        public string UserPathName { get; }
+
+        public CommonConfiguration(string apiKey, string userPathName)
         {
             this.ApiKey = apiKey;
+            this.UserPathName = userPathName;
         }
     }
 
@@ -29,11 +28,13 @@ namespace NeoLoadSelenium.neoload.config
         public bool NavigationTimingEnabled { get; }
         public PathNamingPolicy PathNamingPolicy { get; }
 
+        public string CurrentTransactionName { get; set; }
         public string CurrentCustomName {get; set;}
         public string CurrentLastAction { get; set; }
 
         public EUEConfiguration(
-            string apiKey, 
+            string apiKey,
+            string userPathName,
             string dataExchangeAPIUrl, 
             bool isDebugEnabled, 
             string location, 
@@ -45,7 +46,7 @@ namespace NeoLoadSelenium.neoload.config
             string scriptName,
             PathNamingPolicy pathNamingPolicy,
             bool navigationTimingEnabled
-            ) :base(apiKey)
+            ) :base(apiKey, userPathName)
         {
             this.DataExchangeAPIUrl = dataExchangeAPIUrl;
             this.IsDebugEnabled = isDebugEnabled;
@@ -58,6 +59,7 @@ namespace NeoLoadSelenium.neoload.config
             this.ScriptName = scriptName;
             this.PathNamingPolicy = pathNamingPolicy;
             this.NavigationTimingEnabled = navigationTimingEnabled;
+            this.CurrentTransactionName = null;
             this.CurrentCustomName = null;
             this.CurrentLastAction = "(none)";
         }
@@ -66,13 +68,11 @@ namespace NeoLoadSelenium.neoload.config
     public class DesignConfiguration : CommonConfiguration
     {
         public string DesignAPIUrl { get; }
-        public string UserPathName { get; }
         public string ProjectPath { get; }
         
-        public DesignConfiguration(string apiKey, string designAPIUrl, string userPathName, string projectPath) : base(apiKey)
+        public DesignConfiguration(string apiKey, string designAPIUrl, string userPathName, string projectPath) : base(apiKey, userPathName)
         {
             this.DesignAPIUrl = designAPIUrl;
-            this.UserPathName = userPathName;
             this.ProjectPath = projectPath;
         }
     }

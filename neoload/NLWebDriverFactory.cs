@@ -8,6 +8,20 @@ using OpenQA.Selenium.Chrome;
 
 namespace NeoLoadSelenium.neoload
 {
+    /// <summary>
+    ///  Factory of NeoLoad Selenium WebDriver.
+    /// There are 3 modes:
+    /// - NoApi(default)
+    /// - Design
+    /// - EndUserExperience.
+    /// 
+    /// The nl.selenium.proxy.mode property should be used in order to choose mode.For example:
+    /// -Dnl.selenium.proxy.mode= Design
+    ///
+    /// When NoApi is chosen there is no interaction with NeoLoad.
+    /// When Design is chosen, a recording will be start on NeoLoad through Design API.
+    /// When EndUserExperience is chosen, selenium metrics will be send to NeoLoad through Data Exchange API.
+    /// </summary>
     public class NLWebDriverFactory
     {
 
@@ -27,9 +41,11 @@ namespace NeoLoadSelenium.neoload
             }
         }
 
-        /**
-                 * If the design mode is chosen then the driver will use NeoLoad as Proxy.
-                 */
+        /// <summary>
+        ///  If the design mode is chosen then the driver will use NeoLoad as Proxy.
+        /// </summary>
+        /// <param name="capabilities">capabilities to modify</param>
+        /// <returns>modified capabilities</returns>
         public static DesiredCapabilities AddProxyCapabilitiesIfNecessary(DesiredCapabilities capabilities)
         {
             if (!Mode.DESIGN.Equals(ModeHelper.getMode()))
@@ -60,9 +76,11 @@ namespace NeoLoadSelenium.neoload
             return capabilities;
         }
 
-        /**
-         * If the design mode is chosen then the driver will use NeoLoad as Proxy.
-         */
+        /// <summary>
+        ///  If the design mode is chosen then the driver will use NeoLoad as Proxy.
+        /// </summary>
+        /// <param name="options">driver options to modify</param>
+        /// <returns>modified driver options</returns>
         public static void AddProxyCapabilitiesIfNecessary(DriverOptions options)
         {
             if (!Mode.DESIGN.Equals(ModeHelper.getMode()))
@@ -101,18 +119,22 @@ namespace NeoLoadSelenium.neoload
         }
 
         /// <summary>
-        /// Create a NeoLoad instance to the webDriver.
+        /// Create a NeoLoad instance of the webDriver.
         /// In Design mode, the default User Path will be created or updated if it is already present in opened project.
         /// </summary>
+        /// <param name="webDriver">an instance of a WebDriver as ChromeDriver or FirefoxDriver.</param>
         public static NLWebDriver NewNLWebDriver(IWebDriver webDriver)
         {
             return NewNLWebDriver(webDriver, null, null, new ParamBuilderProvider());
         }
 
         /// <summary>
-        /// Create a NeoLoad instance to the webDriver.
-        /// In Design mode, the userPath in parameter will be created or updated if it is already present in opened project.
+        /// Create a NeoLoad instance of the webDriver.
+        /// In Design mode, the default User Path will be created or updated if it is already present in opened project.
+        /// In EndUserExperience mode, the userPath in parameter will be added to the path of entries sent to NeoLoad.
         /// </summary>
+        /// <param name="webDriver">an instance of a WebDriver as ChromeDriver or FirefoxDriver.</param>
+        /// <param name="userPath">the name of the UserPath.</param>
         public static NLWebDriver NewNLWebDriver(IWebDriver webDriver, string userPath)
         {
             return NewNLWebDriver(webDriver, userPath, null, new ParamBuilderProvider());
@@ -121,7 +143,11 @@ namespace NeoLoadSelenium.neoload
         /// <summary>
         /// Create a NeoLoad instance to the webDriver.
         /// In Design mode, project in parameter will be opened and the userPath in parameter will be created or updated if it is already present in opened project.
+        /// In EndUserExperience mode, the userPath in parameter will be added to the path of entries sent to NeoLoad.
         /// </summary>
+        /// <param name="webDriver">an instance of a WebDriver as ChromeDriver or FirefoxDriver.</param>
+        /// <param name="userPath">the name of the UserPath.</param>
+        /// <param name="projectPath">the path of the project to open in NeoLoad.</param>
         public static NLWebDriver NewNLWebDriver(IWebDriver webDriver, string userPath, string projectPath)
         {
             return NewNLWebDriver(webDriver, userPath, projectPath, new ParamBuilderProvider());
@@ -130,8 +156,12 @@ namespace NeoLoadSelenium.neoload
         /// <summary>
         /// Create a NeoLoad instance to the webDriver.
         /// In Design mode, project in parameter will be opened and the userPath in parameter will be created or updated if it is already present in opened project.
-        /// ParamBuilderProvider can be overriden in order to update parameters.
+        /// In EndUserExperience mode, the userPath in parameter will be added to the path of entries sent to NeoLoad.
         /// </summary>
+        /// <param name="webDriver">an instance of a WebDriver as ChromeDriver or FirefoxDriver.</param>
+        /// <param name="userPath">the name of the UserPath.</param>
+        /// <param name="projectPath">the path of the project to open in NeoLoad.</param>
+        /// <param name="paramBuilderProvider">ParamBuilderProvider class can be overridden in order to update parameters.</param>
         public static NLWebDriver NewNLWebDriver(IWebDriver webDriver, string userPath, string projectPath,
                                                  ParamBuilderProvider paramBuilderProvider)
         {
@@ -140,7 +170,7 @@ namespace NeoLoadSelenium.neoload
             switch (mode)
             {
                 case Mode.END_USER_EXPERIENCE:
-                    var eueConf = ConfigurationHelper.newEUEConfiguration(webDriver.GetType().Name);
+                    var eueConf = ConfigurationHelper.newEUEConfiguration(webDriver.GetType().Name, userPath);
                     interceptor = new WebDriverEUEInterceptor(webDriver, eueConf);
                     break;
                 case Mode.DESIGN:

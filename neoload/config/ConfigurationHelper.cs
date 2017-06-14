@@ -63,7 +63,7 @@ namespace NeoLoadSelenium.neoload.config
             return policyString == null ? PathNamingPolicy.URL : (PathNamingPolicy)Enum.Parse(typeof(PathNamingPolicy), policyString.ToUpper());
         }
 
-        public static EUEConfiguration newEUEConfiguration(string driverType)
+        public static EUEConfiguration newEUEConfiguration(string driverType, string userPathName)
         {
             string dataExchangeApiUrl = getPropertyValue(OPT_DATA_EXCHANGE_URL, DEFAULT_DATA_EXCHANGE_URL);
             string apiKey = getPropertyValue(OPT_API_KEY, "");
@@ -78,7 +78,7 @@ namespace NeoLoadSelenium.neoload.config
             PathNamingPolicy pathNamingPolicy = getPathNamingPolicy();
             bool navigationTimingEnabled = Boolean.Parse(getPropertyValue(OPT_NAVIGATION_TIMING, "true"));
 
-            return new EUEConfiguration(apiKey, dataExchangeApiUrl, isDebug, location, regexToCleanURLs, software, os,
+            return new EUEConfiguration(apiKey, userPathName, dataExchangeApiUrl, isDebug, location, regexToCleanURLs, software, os,
                                         hardware, instanceID, scriptName, pathNamingPolicy, navigationTimingEnabled);
         }
 

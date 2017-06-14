@@ -1,16 +1,10 @@
-﻿using OpenQA.Selenium.Remote;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using OpenQA.Selenium;
+﻿using OpenQA.Selenium;
 using System.Collections.ObjectModel;
 using NeoLoadSelenium.neoload.interceptor;
-using NeoLoadSelenium.neoload.interceptor.eue_element;
 
 namespace NeoLoadSelenium.neoload.wrapper
 {
-    public class NLWebDriver : IWebDriver, ICustomEUEConfigurator, ICustomDesignConfigurator, IHasInputDevices
+    public class NLWebDriver : IWebDriver, ICustomEUEConfigurator, ICommonConfigurator, IHasInputDevices
     {
         private IWebDriver driver;
         private INeoLoadInterceptor interceptor;

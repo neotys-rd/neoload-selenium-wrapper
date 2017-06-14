@@ -18,9 +18,9 @@ namespace NeoLoadSelenium.tests.integration
             Environment.SetEnvironmentVariable("nl.selenium.proxy.mode", "Design");
             Environment.SetEnvironmentVariable("nl.design.api.url", "http://localhost:7400/Design/v1/Service.svc/");
 
-            var webDriver = new FirefoxDriver(NLWebDriverFactory.AddProxyCapabilitiesIfNecessary(new DesiredCapabilities()));
+            var webDriver = new RemoteWebDriver(DesiredCapabilities.HtmlUnitWithJavaScript());
 
-            string projectPath = "C:\\Users\\dregnier\\Documents\\NeoLoad Projects\\v5.3\\Sample_Project\\Sample_Project.nlp";
+            string projectPath = "C:\\Users\\anouvel\\Documents\\NeoLoad Projects\\v6.0\\Sample_Project\\Sample_Project.nlp";
 
             driver = NLWebDriverFactory.NewNLWebDriver(webDriver, "Selenium", projectPath);
 
@@ -35,8 +35,8 @@ namespace NeoLoadSelenium.tests.integration
             driver.StartTransaction("reports");
             driver.FindElement(By.Id("mainmenu")).FindElements(By.TagName("a"))[1].Click();
 
-            driver.StartTransaction("submit");
-            driver.FindElement(By.PartialLinkText("SUBMIT")).Click();
+            driver.StartTransaction("end");
+            driver.Url = "http://ushahidi.demo.neotys.com/" + "/main";
         }
 
         [TearDown]

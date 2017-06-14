@@ -15,11 +15,15 @@ namespace NeoLoadSelenium.neoload.interceptor
 {
     public class EUEEntryHandler
     {
+        private const string TRANSACTION_TIMER_NAME = "Timer";
+
         private EUEConfiguration conf;
         private long startTime;
         private WebDriverException exception = null;
 
         private IDataExchangeAPIClient dataExchangeAPIClient;
+
+        private TimerBuilder timerBuilder = null;
 
         private bool isDebug;
 
@@ -74,14 +78,14 @@ namespace NeoLoadSelenium.neoload.interceptor
 
         public void SendEntry(string currentURL, string pageTitle, string methodName, IDictionary<string, long> advancedValues)
         {
-            sendData(currentURL, pageTitle, methodName, advancedValues);
-            throwStoredException();
+            SendData(currentURL, pageTitle, methodName, advancedValues);
+            ThrowStoredException();
         }
 
-        void sendData(string currentURL, string pageTitle, string methodName, IDictionary<string, long> advancedValues)
+        void SendData(string currentURL, string pageTitle, string methodName, IDictionary<string, long> advancedValues)
         {
             // set the data.
-            List<string> entryPath = createPath(currentURL, pageTitle, conf);
+            List<string> entryPath = CreatePath(currentURL, pageTitle, conf);
             EntryBuilder ebNormal = new EntryBuilder(entryPath, startTime);
             ebNormal.Url = currentURL;
 
@@ -121,6 +125,29 @@ namespace NeoLoadSelenium.neoload.interceptor
             dataExchangeAPIClient.AddEntries(entriesToSend);
         }
 
+        public void StartTimer(string name)
+        {
+            HandleTimer();
+            List<string> path = NewPath(conf);
+            path.Add(TRANSACTION_TIMER_NAME);
+            timerBuilder = TimerBuilder.Start(path);
+        }
+
+        private void HandleTimer()
+        {
+            TimerBuilder current = timerBuilder;
+            if (current != null)
+            {
+                dataExchangeAPIClient.AddEntry(current.Stop());
+            }
+        }
+
+        public void StopAndSendTimer()
+        {
+            HandleTimer();
+            timerBuilder = null;
+        }
+
         /// <summary>
         /// Visible for testing.
         /// </summary>
@@ -128,17 +155,14 @@ namespace NeoLoadSelenium.neoload.interceptor
         /// <param name="pageTitle"></param>
         /// <param name="conf"></param>
         /// <returns></returns>
-        public static List<string> createPath(string currentURL, string pageTitle, EUEConfiguration conf)
+        public static List<string> CreatePath(string currentURL, string pageTitle, EUEConfiguration conf)
         {
-            List<string> path = new List<string>();
-
-            path.Add(getScriptName(conf.ScriptName));
-            path.Add(TimerBuilder.TimersName);
+            List<string> path = NewPath(conf);
 
             string customName = conf.CurrentCustomName;
             if (customName != null)
             {
-                List<string> pathItems = splitOnSlash(customName);
+                List<string> pathItems = SplitOnSlash(customName);
                 path.AddRange(pathItems);
 
                 // the custom name is only used once.
@@ -146,8 +170,8 @@ namespace NeoLoadSelenium.neoload.interceptor
             }
             else if (PathNamingPolicy.URL == conf.PathNamingPolicy)
             {
-                string prettyURL = getPrettyURL(currentURL, conf.RegexToCleanURLs);
-                path.AddRange(splitOnSlash(prettyURL));
+                string prettyURL = GetPrettyURL(currentURL, conf.RegexToCleanURLs);
+                path.AddRange(SplitOnSlash(prettyURL));
 
             }
             else if (PathNamingPolicy.ACTION == conf.PathNamingPolicy)
@@ -163,7 +187,7 @@ namespace NeoLoadSelenium.neoload.interceptor
                 }
                 else
                 {
-                    path.AddRange(splitOnSlash(pageTitle));
+                    path.AddRange(SplitOnSlash(pageTitle));
                 }
             }
             else
@@ -173,7 +197,26 @@ namespace NeoLoadSelenium.neoload.interceptor
             return path;
         }
 
-        private static string getScriptName(string scriptName)
+        public static List<string> NewPath(EUEConfiguration conf)
+        {
+            List<string> path = new List<string>(5);
+
+            path.Add(GetScriptName(conf.ScriptName));
+            path.Add(TimerBuilder.TimersName);
+            if (conf.UserPathName != null && !conf.UserPathName.Equals(""))
+            {
+                path.Add(conf.UserPathName);
+            }
+            if (conf.CurrentTransactionName != null && !conf.CurrentTransactionName.Equals(""))
+            {
+                path.Add(conf.CurrentTransactionName);
+            }
+
+            return path;
+
+        }
+
+        private static string GetScriptName(string scriptName)
         {
             if (scriptName != null && !scriptName.Equals(""))
             {
@@ -182,7 +225,7 @@ namespace NeoLoadSelenium.neoload.interceptor
             return ConfigurationHelper.getUnitTestName();
         }
 
-        private static List<string> splitOnSlash(string customName)
+        private static List<string> SplitOnSlash(string customName)
         {
             string[] fragments = customName.Split('/');
             List<string> list = new List<string>();
@@ -196,7 +239,7 @@ namespace NeoLoadSelenium.neoload.interceptor
             return list;
         }
 
-        private static string getPrettyURL(string urlStr, string regexURLCleaner)
+        private static string GetPrettyURL(string urlStr, string regexURLCleaner)
         {
             string cleanedURL = urlStr;
             try
@@ -235,7 +278,7 @@ namespace NeoLoadSelenium.neoload.interceptor
         /// <summary>
         /// Throw the stored exception if there is one.
         /// </summary>
-        void throwStoredException()
+        void ThrowStoredException()
         {
             try
             {

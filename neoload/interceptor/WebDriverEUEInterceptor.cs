@@ -1,13 +1,6 @@
-﻿using NeoLoadSelenium.neoload.common;
-using NeoLoadSelenium.neoload.config;
+﻿using NeoLoadSelenium.neoload.config;
 using NeoLoadSelenium.neoload.interceptor.eue_element;
-using Neotys.DataExchangeAPI.Client;
 using OpenQA.Selenium;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Text;
 
 namespace NeoLoadSelenium.neoload.interceptor
 {
@@ -84,12 +77,14 @@ namespace NeoLoadSelenium.neoload.interceptor
 
         public void DoOnStartTransaction(string name)
         {
-            // nothing to do
+            config.CurrentTransactionName = name;
+            dataExchangeEntryHelper.StartTimer(name);
         }
 
         public void DoOnStopTransaction()
         {
-            // nothing to do
+            config.CurrentTransactionName = null;
+            dataExchangeEntryHelper.StopAndSendTimer();
         }
 
         public object proxify(object webElement)

@@ -64,7 +64,7 @@
     <Compile Include="neoload\interceptor\WebDriverDesignInterceptor.cs" />
     <Compile Include="neoload\interceptor\WebDrivers.cs" />
     <Compile Include="neoload\NLWebDriverFactory.cs" />
-    <Compile Include="neoload\wrapper\ICustomDesignConfigurator.cs" />
+    <Compile Include="neoload\wrapper\ICommonConfigurator.cs" />
     <Compile Include="neoload\wrapper\ICustomEUEConfigurator.cs" />
     <Compile Include="neoload\interceptor\WebDriverEUEInterceptor.cs" />
     <Compile Include="neoload\wrapper\NLWebDriver.cs" />

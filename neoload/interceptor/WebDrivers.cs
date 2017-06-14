@@ -5,7 +5,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
-using System.Text;
 
 namespace NeoLoadSelenium.neoload.interceptor
 {
@@ -131,9 +130,6 @@ namespace NeoLoadSelenium.neoload.interceptor
             map.Add(key, (long)value);
         }
 
-        /// <summary>
-        ///  From http://stackoverflow.com/a/9608008
-        /// </summary>
         private static string GetDomainName(string urlAsString)
         {
             Uri uri;
