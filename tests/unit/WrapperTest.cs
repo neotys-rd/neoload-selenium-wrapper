@@ -50,7 +50,7 @@ namespace NeoLoadSelenium.tests.unit
             try
             {
                 NLWebDriver driver = NLWebDriverFactory.NewNLWebDriver(webDriver);
-                // this should do nothing bu not throw an exception.
+                // this should do nothing but not throw an exception.
                 driver.StartTransaction("name");
             }
             finally

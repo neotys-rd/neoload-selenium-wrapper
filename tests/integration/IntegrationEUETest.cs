@@ -34,11 +34,14 @@ namespace NeoLoadSelenium.tests.integration
         {
             
             // check it does not impact EUE
-            driver.StartTransaction("home1");
+            driver.StartTransaction("home");
 
             driver.Url = "http://ushahidi.demo.neotys.com/";
 
-            driver.SetCustomName("C-SHARP-1");
+
+            driver.StopTransaction();
+
+            driver.StartTransaction("main");
 
             IWebElement firstFind = driver.FindElement(By.Id("mainmenu"));
 
@@ -54,7 +57,7 @@ namespace NeoLoadSelenium.tests.integration
             //    // do nothing
             //}
 
-            driver.SetCustomName("C-SHARP-2");
+            driver.SetCustomName("C-SHARP");
 
             driver.Url = "http://ushahidi.demo.neotys.com/";
             

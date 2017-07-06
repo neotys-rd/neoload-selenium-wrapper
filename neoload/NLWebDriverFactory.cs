@@ -170,7 +170,12 @@ namespace NeoLoadSelenium.neoload
             switch (mode)
             {
                 case Mode.END_USER_EXPERIENCE:
-                    var eueConf = ConfigurationHelper.newEUEConfiguration(webDriver.GetType().Name, userPath);
+                    ICapabilities capabilitites = null;
+                    if(webDriver is IHasCapabilities)
+                    {
+                        capabilitites = (webDriver as IHasCapabilities).Capabilities;
+                    }
+                    var eueConf = ConfigurationHelper.newEUEConfiguration(webDriver.GetType().Name, userPath, capabilitites);
                     interceptor = new WebDriverEUEInterceptor(webDriver, eueConf);
                     break;
                 case Mode.DESIGN:

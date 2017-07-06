@@ -1,4 +1,5 @@
 ﻿using NUnit.Framework;
+using OpenQA.Selenium;
 using System;
 using System.Diagnostics;
 using System.Reflection;
@@ -32,6 +33,16 @@ namespace NeoLoadSelenium.neoload.config
 
         static string DEFAULT_SCRIPT_NAME_PREFIX = "SeleniumDelegate";
 
+        private static string OPT_CAPABILITIES_PREFIX = OPT_PREFIX + "capabilities.";
+
+	    /** Environment variables used to override the key used to find device information in capabilities. */
+	    public static string OPT_CAPABILITIES_PLATFORM_NAME = OPT_CAPABILITIES_PREFIX + "platform.name";
+	    public static string OPT_CAPABILITIES_PLATFORM_VERSION = OPT_CAPABILITIES_PREFIX + "platform.version";
+	    public static string OPT_CAPABILITIES_DEVICE_NAME = OPT_CAPABILITIES_PREFIX + "device.name";
+	    public static string OPT_CAPABILITIES_BROWSER_NAME = OPT_CAPABILITIES_PREFIX + "browser.name";
+	    public static string OPT_CAPABILITIES_BROWSER_VERSION = OPT_CAPABILITIES_PREFIX + "browser.version";
+	    public static string OPT_CAPABILITIES_LOCATION = OPT_CAPABILITIES_PREFIX + "location";
+
         public static string getPropertyValue(string key, string defaultValue)
         {
             string envValue = Environment.GetEnvironmentVariable(key);
@@ -63,16 +74,16 @@ namespace NeoLoadSelenium.neoload.config
             return policyString == null ? PathNamingPolicy.URL : (PathNamingPolicy)Enum.Parse(typeof(PathNamingPolicy), policyString.ToUpper());
         }
 
-        public static EUEConfiguration newEUEConfiguration(string driverType, string userPathName)
+        public static EUEConfiguration newEUEConfiguration(string driverType, string userPathName, ICapabilities capabilities)
         {
             string dataExchangeApiUrl = getPropertyValue(OPT_DATA_EXCHANGE_URL, DEFAULT_DATA_EXCHANGE_URL);
             string apiKey = getPropertyValue(OPT_API_KEY, "");
             bool isDebug = Boolean.Parse(getPropertyValue(OPT_DEBUG, "false"));
-            string location = getPropertyValue(OPT_LOCATION, "");
+            string location = getPropertyValue(OPT_LOCATION, getLocation(capabilities));
             string regexToCleanURLs = getPropertyValue(OPT_REGEX_TO_CLEAN_URLS, "(.*?)[#?;%].*");
-            string software = getPropertyValue(OPT_SOFTWARE, driverType);
-            string os = getPropertyValue(OPT_OS, Environment.OSVersion.VersionString);
-            string hardware = getPropertyValue(OPT_HARDWARE, "");
+            string software = getPropertyValue(OPT_SOFTWARE, getSoftware(capabilities, driverType));
+            string os = getPropertyValue(OPT_OS, getOs(capabilities, Environment.OSVersion.VersionString));
+            string hardware = getPropertyValue(OPT_HARDWARE, getHardware(capabilities));
             string instanceID = getPropertyValue(OPT_INSTANCE_ID, getDefaultInstanceID());
             string scriptName = getPropertyValue(OPT_SCRIPT_NAME, null);
             PathNamingPolicy pathNamingPolicy = getPathNamingPolicy();
@@ -80,6 +91,70 @@ namespace NeoLoadSelenium.neoload.config
 
             return new EUEConfiguration(apiKey, userPathName, dataExchangeApiUrl, isDebug, location, regexToCleanURLs, software, os,
                                         hardware, instanceID, scriptName, pathNamingPolicy, navigationTimingEnabled);
+        }
+
+        private static string getHardware(ICapabilities capabilities)
+        {
+            if (capabilities != null)
+            {
+                string capabilityName = getPropertyValue(OPT_CAPABILITIES_DEVICE_NAME, "deviceName");
+                if (capabilities.HasCapability(capabilityName))
+                {
+                    return capabilities.GetCapability(capabilityName).ToString();
+                }
+            }
+            return "";
+        }
+
+        private static string getOs(ICapabilities capabilities, string systemOs)
+        {
+            if (capabilities != null)
+            {
+                string platformNameCapability = getPropertyValue(OPT_CAPABILITIES_PLATFORM_NAME, "platformName");
+                if (capabilities.HasCapability(platformNameCapability))
+                {
+                    string platformName = capabilities.GetCapability(platformNameCapability).ToString();
+                    string platformVersionCapability = getPropertyValue(OPT_CAPABILITIES_PLATFORM_VERSION, "platformVersion");
+                    if (capabilities.HasCapability(platformVersionCapability))
+                    {
+                        return platformName + " " + capabilities.GetCapability(platformVersionCapability).ToString();
+                    }
+                    return platformName;
+                }
+            }
+            return systemOs;
+        }
+
+        private static string getSoftware(ICapabilities capabilities, string driverType)
+        {
+            if (capabilities != null)
+            {
+                string browserNameCapability = getPropertyValue(OPT_CAPABILITIES_BROWSER_NAME, "browserName");
+                if (capabilities.HasCapability(browserNameCapability))
+                {
+                    string browserName = capabilities.GetCapability(browserNameCapability).ToString();
+                    string browserVersionCapability = getPropertyValue(OPT_CAPABILITIES_BROWSER_VERSION, "browserVersion");
+                    if (capabilities.HasCapability(browserVersionCapability))
+                    {
+                        return browserName + " " +capabilities.GetCapability(browserVersionCapability).ToString();
+                    }
+                    return browserName;
+                }
+            }
+            return "";
+        }
+
+        private static string getLocation(ICapabilities capabilities)
+        {
+            if (capabilities != null)
+            {
+                string capabilityName = getPropertyValue(OPT_CAPABILITIES_LOCATION, "location");
+                if (capabilities.HasCapability(capabilityName))
+                {
+                    return capabilities.GetCapability(capabilityName).ToString();
+                }
+            }
+            return "";
         }
 
         public static string getUnitTestName()

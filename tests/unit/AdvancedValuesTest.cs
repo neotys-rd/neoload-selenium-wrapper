@@ -21,7 +21,7 @@ namespace NeoLoadSelenium.tests.unit
 
             try
             {
-                IDictionary <string, long> advancedValuesHU = WebDrivers.GetAdvancedValues(webDriver, ConfigurationHelper.newEUEConfiguration("", ""));
+                IDictionary <string, long> advancedValuesHU = WebDrivers.GetAdvancedValues(webDriver, ConfigurationHelper.newEUEConfiguration("", "", null));
                 Assert.IsTrue(advancedValuesHU.Count == 0); // There should be no values for the html unit driver.
             }
             finally
