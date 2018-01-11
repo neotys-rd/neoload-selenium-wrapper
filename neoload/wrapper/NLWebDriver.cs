@@ -1,10 +1,14 @@
 ﻿using OpenQA.Selenium;
 using System.Collections.ObjectModel;
 using NeoLoadSelenium.neoload.interceptor;
+using OpenQA.Selenium.Internal;
+using OpenQA.Selenium.Interactions;
+using System;
+using System.Collections.Generic;
 
 namespace NeoLoadSelenium.neoload.wrapper
 {
-    public class NLWebDriver : IWebDriver, ICustomEUEConfigurator, ICommonConfigurator, IHasInputDevices
+    public class NLWebDriver : IWebDriver, ICustomEUEConfigurator, ICommonConfigurator, IHasInputDevices, IActionExecutor
     {
         private IWebDriver driver;
         private INeoLoadInterceptor interceptor;
@@ -94,6 +98,18 @@ namespace NeoLoadSelenium.neoload.wrapper
             }
         }
 
+        public bool IsActionExecutor
+        {
+            get
+            {
+                if (driver is IActionExecutor)
+                {
+                    return (driver as IActionExecutor).IsActionExecutor;
+                }
+                return false;
+            }
+        }
+
         public void StartTransaction(string name)
         {
             interceptor.DoOnStartTransaction(name);
@@ -171,6 +187,22 @@ namespace NeoLoadSelenium.neoload.wrapper
         public ITargetLocator SwitchTo()
         {
             return interceptor.proxify(driver.SwitchTo()) as ITargetLocator;
+        }
+
+        public void PerformActions(IList<ActionSequence> actionSequenceList)
+        {
+            if (driver is IActionExecutor)
+            {
+                (driver as IActionExecutor).PerformActions(actionSequenceList);
+            }
+        }
+
+        public void ResetInputState()
+        {
+            if (driver is IActionExecutor)
+            {
+                (driver as IActionExecutor).ResetInputState();
+            }
         }
     }
 }

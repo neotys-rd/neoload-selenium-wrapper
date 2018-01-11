@@ -2,9 +2,6 @@
 using NeoLoadSelenium.neoload.config;
 using OpenQA.Selenium;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace NeoLoadSelenium.neoload.interceptor.eue_element
 {

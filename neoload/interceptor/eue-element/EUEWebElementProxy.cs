@@ -34,7 +34,7 @@ namespace NeoLoadSelenium.neoload.interceptor.eue_element
         public IWebElement getProxy()
         {
             ProxyGenerator generator = new ProxyGenerator(new PersistentProxyBuilder());
-            IWebElement proxy = generator.CreateInterfaceProxyWithTarget(typeof(IWebElement), element, interceptor) as IWebElement;
+            IWebElement proxy = generator.CreateInterfaceProxyWithTarget(typeof(IWebElement), new Type[1]{typeof(ILocatable)}, element, ProxyGenerationOptions.Default, interceptor) as IWebElement;
             return proxy;
         }
     }
